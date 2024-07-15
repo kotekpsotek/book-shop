@@ -1,8 +1,8 @@
 ## Road map
-1. Get the book list available in the shop
-2. Get the books based on ISBN
-3. Get all books by the author
-4. Get all books based on title
+1. Get the book list available in the shop - [done]
+2. Get the books based on ISBN - [done]
+3. Get all books by the author - [done]
+4. Get all books based on title - [done]
 5. Get a book review
 6. Register new user,
 7. Login as a registered user

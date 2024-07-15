@@ -1,3 +1,4 @@
+const { Response } = require("express"); // types
 const express = require("express");
 const app = express();
 
@@ -38,27 +39,67 @@ app.get("/get-books/:base_on/:id", async (req, res) => {
     // Base status code establishement
     res.status(200);
 
+    /**
+     * 
+     * @param {any[]} v 
+     * @param {Response} res 
+     */
+    const returnV = (v, res) => {
+        if (v.length) {
+            res
+                .status(200)
+                .json(v)
+        }
+        else res.sendStatus(404);
+    }
+
     switch(base_on) {
         // Give back all books avaiable in the store
         case "all":
             {
+                const books = await modelBooks.aggregate([
+                    { $match: {} },
+                    { $project: { _id: false, __v: false } }
+                ]);
 
+                returnV(books, res);
             }
         break;
 
         // Give back one book refer to its isbn
         case "isbn":
+            {
+                const books = await modelBooks.aggregate([
+                    { $match: {  $or: [{ isbn: id }, { isbn: { $regex: new RegExp(`^${id}`) } }] }},
+                    { $project: { _id: false, __v: false } },
+                ]);
 
+                returnV(books, res);
+            }
         break;
 
         // Give all books from author
         case "author":
+            {
+                const books = await modelBooks.aggregate([
+                    { $match: { author: { $eq: id } } },
+                    { $project: { _id: false, __v: false } },
+                ]);
 
+                returnV(books, res);
+            }
         break;
 
         // Give all books base on its title
         case "title":
+            {
+                const books = await modelBooks.aggregate([
+                    { $match: {  $or: [{ title: id }, { title: { $regex: new RegExp(`^${id}`) } }] }},
+                    { $project: { _id: false, __v: false } },
+                ]);
 
+                returnV(books, res);
+            }
         break;
 
         // Give book review and all user opinions
