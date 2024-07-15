@@ -33,6 +33,28 @@ app.post("/save-book", (req, res) => {
     else res.sendStatus(403);
 });
 
+app.post("/add-reviews/:book_isbn", async (req, res) => {
+    const { book_isbn } = req.params;
+
+    if (modelBooks.exists({ isbn: { $eq: book_isbn } })) {
+        /**
+         * @type {{ reviews: {rating, author, date}[] }}
+         */
+        const body = req.body;
+        // const checkRating = req 
+        // TODO: Add additional rating checking here
+        // TODO: Update review model by attachement here email of commentor
+        if (body?.reviews?.length) {
+            const _findByISBN = await modelBooks.updateOne({
+                isbn: book_isbn 
+            }, { $push: { reviews: { $each: body.reviews } } });
+            res.sendStatus(202);
+        }
+        else res.sendStatus(400);
+    }
+    else res.sendStatus(404);
+});
+
 app.get("/get-books/:base_on/:id", async (req, res) => {
     const { base_on, id } = req.params;
 

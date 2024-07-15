@@ -1,3 +1,6 @@
+# Book shop
+Is a nimble project for my participation within Coursera IBM Full Stack Developer course
+
 ## Road map
 1. Get the book list available in the shop - [done]
 2. Get the books based on ISBN - [done]
