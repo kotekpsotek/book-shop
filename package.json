@@ -8,7 +8,7 @@
     "run:dev": "nodemon index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Michał Szczepański",
   "license": "ISC",
   "devDependencies": {
     "vitest": "^2.0.2"
