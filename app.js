@@ -42,8 +42,6 @@ app.post("/add-reviews/:book_isbn", async (req, res) => {
          * @type {{ reviews: {rating, author, date}[] }}
          */
         const body = req.body;
-        console.log(body)
-        // const checkRating = req 
         const checkRatingEvery = body.reviews.every((v) => {
             return v.rating >= 1 && v.rating <= 5
         })
@@ -137,6 +135,27 @@ app.post("/modify-review/:book/:review_id", async (req, res) => {
     }
     else res.sendStatus(404);
 });
+
+// Delete review
+app.delete("/delete-review/:book/:review_id", async (req, res) => {
+    const { book, review_id } = req.params;
+    /**
+     * @type {{ delete_password: string }}
+     */
+    const body = req.body;
+
+    if (body.delete_password == process.env.passwordAllowDelete) {
+        const deleteOp = await modelBooks.updateOne({ $or: [{ isbn: book }, { title: book }] }, { $pull: { reviews: {
+            id: { $eq: review_id }
+        } } })
+
+        if (deleteOp.modifiedCount == 1) {
+            res.sendStatus(200)
+        }
+        else res.sendStatus(404)   
+    }
+    else res.sendStatus(401);
+})
 
 app.get("/get-books/:base_on/:id", async (req, res) => {
     const { base_on, id } = req.params;
