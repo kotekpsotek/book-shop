@@ -8,6 +8,7 @@ require("dotenv").config();
 // User configuration sides
 const userActions = require("./addons/userActions");
 const { modelBooks } = require("./database/models");
+const { review } = require("./database/schema/books");
 
 app.use(express.json());
 app.use("/user-actions", userActions);
@@ -54,6 +55,48 @@ app.post("/add-reviews/:book_isbn", async (req, res) => {
     }
     else res.sendStatus(404);
 });
+
+// Send 200 status when found book where reviews should appear
+app.get("/book-reviews/:book/:mode", async (req, res) => {
+    /*
+     * Book can state: title, isbn
+     * mode can be: all or single id
+    */
+    const { book, mode } = req.params;
+    const bookReviewsSearch = await modelBooks.aggregate([
+        { $match: { $or: [{ isbn: book }, { title: book }] } },
+        // { $unwind: "$reviews" },
+        { $project: { _id: 0, __v: 0, "reviews._id": 0 } }
+    ])
+
+    if (bookReviewsSearch[0]) {
+        switch(mode) {
+            case "all":
+                res.status(200)
+                   .json({ "reviews": bookReviewsSearch[0].reviews })
+            break;
+
+            // Search specific book review
+            default:
+                const agrOp = await modelBooks.aggregate([
+                    { $match: { $or: [{ isbn: book }, { title: book }] } },
+                    { $unwind: { path: "$reviews" } },
+                    { $match: { "reviews.id": { $eq: mode } } },
+                    { $project: { "reviews._id": 0 } }
+                ])
+
+                console.log(agrOp[0])
+
+                if (agrOp.length) {
+                    res.status(200)
+                        .json({ "reviews": [agrOp[0].reviews] })
+                }
+            break;
+        }
+    }
+
+    if (express.response.headersSent) res.sendStatus(404);
+})
 
 app.get("/get-books/:base_on/:id", async (req, res) => {
     const { base_on, id } = req.params;
