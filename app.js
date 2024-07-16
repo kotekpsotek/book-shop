@@ -43,9 +43,7 @@ app.post("/add-reviews/:book_isbn", async (req, res) => {
          */
         const body = req.body;
         // const checkRating = req 
-        // TODO: Add additional rating checking here
-        // TODO: Update review model by attachement here email of commentor
-        if (body?.reviews?.length) {
+        if (body?.reviews?.length && (body.rating >= 1 && body.rating <= 5)) {
             const _findByISBN = await modelBooks.updateOne({
                 isbn: book_isbn 
             }, { $push: { reviews: { $each: body.reviews } } });
