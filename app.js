@@ -42,8 +42,13 @@ app.post("/add-reviews/:book_isbn", async (req, res) => {
          * @type {{ reviews: {rating, author, date}[] }}
          */
         const body = req.body;
+        console.log(body)
         // const checkRating = req 
-        if (body?.reviews?.length && (body.rating >= 1 && body.rating <= 5)) {
+        const checkRatingEvery = body.reviews.every((v) => {
+            return v.rating >= 1 && v.rating <= 5
+        })
+
+        if (body?.reviews?.length && checkRatingEvery) {
             const _findByISBN = await modelBooks.updateOne({
                 isbn: book_isbn 
             }, { $push: { reviews: { $each: body.reviews } } });
@@ -95,6 +100,43 @@ app.get("/book-reviews/:book/:mode", async (req, res) => {
 
     if (express.response.headersSent) res.sendStatus(404);
 })
+
+// Modify review but only when you're its author
+app.post("/modify-review/:book/:review_id", async (req, res) => {
+    const { book, review_id } = req.params;
+    /**
+        @type {{ author: string, content?: string, rating?: number }}
+        * User can modify only content or rating but only when is its author
+    */
+    const body = req.body;
+    const review = await modelBooks.aggregate([
+        { $match: { $or: [{ isbn: { $eq: book } }, { title: { $eq: book } }] } },
+        { $unwind: "$reviews" },
+        { $project: { reviews: 1 } },
+        { $match: { "reviews.id": { $eq: review_id } } }
+    ]);
+
+    if (review) {
+        // Only when review has same author that tries to edit
+        if (body.author == review[0]?.reviews.author) {
+            let updateCommand = {};
+
+            if (body.content?.length) {
+                updateCommand["reviews.$.content"] = body.content;
+            }
+
+            if (body.rating && body.rating >= 1 && body.rating <= 5) {
+                updateCommand["reviews.$.rating"] = body.rating;
+            }
+
+            const updateAc = await modelBooks.findOneAndUpdate({ "reviews.id": review_id }, { $set: updateCommand })
+
+            if (updateAc) res.sendStatus(200);
+        }
+        else res.sendStatus(401)
+    }
+    else res.sendStatus(404);
+});
 
 app.get("/get-books/:base_on/:id", async (req, res) => {
     const { base_on, id } = req.params;

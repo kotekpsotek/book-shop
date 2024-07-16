@@ -9,7 +9,9 @@ const review = new Schema({
     },
     rating: { type: Number, default: 5.0 },
     author: { type: String, required: true },
-    date: { type: Date, default: () => new Date() }
+    content: { type: String, required: true },
+    date: { type: Date, default: () => new Date() },
+    modification_date: { type: Date, optional: true }
 })
 
 const book = new Schema({
