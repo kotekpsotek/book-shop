@@ -1,6 +1,7 @@
 const { Response } = require("express"); // types
 const express = require("express");
 const app = express();
+const session = require("express-session");
 
 // Load environmental variables to process.env
 require("dotenv").config();
@@ -11,6 +12,9 @@ const { modelBooks } = require("./database/models");
 const { review } = require("./database/schema/books");
 
 app.use(express.json());
+app.use(session({ secret: process.env.cookieSecret, cookie: { maxAge: 60000 }, resave: true, saveUninitialized: false}))
+
+// User actions
 app.use("/user-actions", userActions);
 
 // Search by author
