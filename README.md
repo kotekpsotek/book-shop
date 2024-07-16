@@ -7,7 +7,7 @@ Is a nimble project for my participation within Coursera IBM Full Stack Develope
 3. Get all books by the author - [done]
 4. Get all books based on title - [done]
 5. Get a book review [done]
-6. Register new user,
+6. Register new user, - [done]
 7. Login as a registered user
 8. Add/modify a book review, add = [done], modify - [done]
 9. Delete book review added by that particular user, - [done]

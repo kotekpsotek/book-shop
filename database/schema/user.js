@@ -6,7 +6,7 @@ const user = new Schema({
     name: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true, minLength: 8, maxLength: 500 },
-    arrivalDate: { type: Date , default: () => new Date() }
+    arrivalDate: { type: Date , default: () => new Date() },
 })
 
 module.exports = user;
