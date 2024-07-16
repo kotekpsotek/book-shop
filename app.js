@@ -13,6 +13,23 @@ const { review } = require("./database/schema/books");
 app.use(express.json());
 app.use("/user-actions", userActions);
 
+// Search by author
+// Get all books from specific author
+app.get("/by-author/:author", async (req, res) => {
+    const author = req.params.author;
+    // const seek = await modelBooks.find({ author: { $eq: author } }, { _id: 0, __v: 0 });
+    const seekBooks = await modelBooks.aggregate([
+        { $match: { author: { $eq: author } } },
+        { $project: { _id: 0, __v: 0, reviews: 0 } }
+    ])
+
+    if (seekBooks.length) {
+        res.status(200)
+            .json({ "books_by_author": seekBooks })
+    }
+    else res.sendStatus(404);
+})
+
 // Book library handling
 app.post("/save-book", (req, res) => {
     if (req.body.password && req.body.book_data) {
