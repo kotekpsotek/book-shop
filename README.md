@@ -14,4 +14,4 @@ Is a nimble project for my participation within Coursera IBM Full Stack Develope
 10. Get all books – Using async callback function, - [done] = because it's a mongodb async environment
 11. Search by ISBN – Using Promises, - [done] = because it's a mongodb async environment
 12. Search by Author, - [done]
-13. Search by title
+13. Search by title - [done]

@@ -28,7 +28,24 @@ app.get("/by-author/:author", async (req, res) => {
             .json({ "books_by_author": seekBooks })
     }
     else res.sendStatus(404);
-})
+});
+
+// Get books by title
+// You can pass here the part of title
+app.get("/by-title/:title", async (req, res) => {
+    const { title } = req.params;
+    // const byTitle = await modelBooks.find({ title: { $regex: new RegExp(`${title}`) } });
+    const byTitle = await modelBooks.aggregate([
+        { $match: { title: { $regex: new RegExp(`${title}`) } } },
+        { $project: { _id: 0, __v: 0, reviews: 0 } }
+    ]);
+
+    if (byTitle.length) {
+        res.status(200)
+            .json({ "books_by_title": byTitle })   
+    }
+    else res.sendStatus(404);
+});
 
 // Book library handling
 app.post("/save-book", (req, res) => {
